@@ -1,0 +1,84 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <locale.h>
+#include <stdio.h>
+#include <Windows.h>
+#define N 10
+//char* set_smth(char *str) {
+//	return '\0';
+//}
+/*
+// максимальное количество динамических строк
+int main()
+{
+	system("chcp 1251");
+	char* str[N]; // статический массив указателей для адресации динамических строк
+	char buff[N] = { 'q' };// буфер для ввода строки
+	int i, j, k;
+	//динамическую память запрашиваем для каждой строки в цикле
+	printf("Введите несколько строк на латинице, окончание ввода - слово yes\n");
+		for (k = 0; buff[0]; k++)
+		{
+			gets(buff);
+			if (!strcmp(buff, "yes")) {
+				break;
+			}
+			// ввод строки в буфер
+			// выделение динамической памяти под строку
+			str[k] = (char*)malloc(strlen(buff) + 1);
+			strcpy(str[k], buff);
+			// копирование строки в динамическую память
+		}
+
+		for (i = 0; i < strlen(str); i++) {
+			if ((i + 1) % 2 == 0)
+			{
+				size_t count = 1;
+				memmove(str[i] + count, str[i], strlen(str) + 1);
+				memset(str[i], '+', count);
+			}
+			else {
+				int temp = 0;
+				char word[20];
+				for (j = 0; j < strlen(str[i]); j++)
+				{
+					if (!strcmp(" ", &str[i][j]))
+					{
+						temp = j;
+						break;
+					}
+					strcpy(word, &str[i][j]);
+				}
+				printf("%s\n", word);
+			}
+			printf("%s", str[i]);
+			printf("\n");
+		}
+
+		// освобождение динамической памяти
+		for (i = 0; i < k; i++)
+		{
+			free(str[i]);
+			str[i] = 0;
+		}
+		// system("pause");
+		return 0;
+}
+*/
+//2
+
+int main()
+{
+	srand(time(NULL));
+	float **mat;
+	int n = 0;
+	int m = 0;
+	scanf("%d %d", &n, &m);
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			mat[i][j] = rand() % 20 - 10;
+			printf("%f\t", mat[i][j]);
+		}
+		printf("\n");
+	}
+	free(mat);
+}
