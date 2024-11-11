@@ -66,19 +66,24 @@ int main()
 */
 //2
 
+//2
+
 int main()
 {
 	srand(time(NULL));
 	float **mat;
-	int n = 0;
-	int m = 0;
+	int n;
+	int m;
 	scanf("%d %d", &n, &m);
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < m; j++) {
+	mat = (int**)malloc(sizeof(int*) * n);
+	for (int i = 0; i < n; i++) 
+	{
+		for (int j = 0; j < m; j++)
+		{
 			mat[i][j] = rand() % 20 - 10;
 			printf("%f\t", mat[i][j]);
 		}
 		printf("\n");
 	}
-	free(mat);
+	//free(*mat);
 }
