@@ -4,6 +4,7 @@
 #include <time.h>
 #include <Windows.h>
 #define N 10
+
 //char* set_smth(char *str) {
 //	return '\0';
 //}
@@ -19,19 +20,15 @@ int main()
 	printf("Введите несколько строк, окончание ввода - слово yes\n");
 		for (k = 0; buff[0]; k++)
 		{
-			
+			// ввод строки в буфер
+			gets(buff);
 			if (!strcmp(buff, "yes")) {
 				break;
 			}
-			else {
-				gets(buff);
-				// ввод строки в буфер
-				// выделение динамической памяти под строку
-				str[k] = (char*)malloc(strlen(buff) + 1);
-				strcpy(str[k], buff);
-				// копирование строки в динамическую память
-			}
-			
+			// выделение динамической памяти под строку
+			str[k] = (char*)malloc(strlen(buff) + 1);
+			// копирование строки в динамическую память
+			strcpy(str[k], buff);
 		}
 		
 		printf("====================\n");
@@ -46,18 +43,20 @@ int main()
 				printf("\n");
 			}
 			else {
-				int temp = 0;
+				int last = 0;
 				char word[20];
-				for (j = 0; j < strlen(str[i]); j++)
+				for (j = 0; j < strlen(str[i]) - 1; j++)
 				{
 					if (!strcmp(" ", &str[i][j]))
 					{
-						temp = j;
-						break;
+						for (int k = last; k < j; k++) {
+							strcpy(word, &str[i][k]);
+						}
+						last = j;
 					}
-					strcpy(word, &str[i][j]);
+					printf("word: %s\n", word);
 				}
-				printf("word: %s\n", word);
+				
 			}
 		}
 
