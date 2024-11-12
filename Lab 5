@@ -1,12 +1,13 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include <locale.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <Windows.h>
 #define N 10
 //char* set_smth(char *str) {
 //	return '\0';
 //}
-/*
+
 // максимальное количество динамических строк
 int main()
 {
@@ -15,26 +16,34 @@ int main()
 	char buff[N] = { 'q' };// буфер для ввода строки
 	int i, j, k;
 	//динамическую память запрашиваем для каждой строки в цикле
-	printf("Введите несколько строк на латинице, окончание ввода - слово yes\n");
+	printf("Введите несколько строк, окончание ввода - слово yes\n");
 		for (k = 0; buff[0]; k++)
 		{
-			gets(buff);
+			
 			if (!strcmp(buff, "yes")) {
 				break;
 			}
-			// ввод строки в буфер
-			// выделение динамической памяти под строку
-			str[k] = (char*)malloc(strlen(buff) + 1);
-			strcpy(str[k], buff);
-			// копирование строки в динамическую память
+			else {
+				gets(buff);
+				// ввод строки в буфер
+				// выделение динамической памяти под строку
+				str[k] = (char*)malloc(strlen(buff) + 1);
+				strcpy(str[k], buff);
+				// копирование строки в динамическую память
+			}
+			
 		}
+		
+		printf("====================\n");
 
 		for (i = 0; i < strlen(str); i++) {
 			if ((i + 1) % 2 == 0)
 			{
 				size_t count = 1;
-				memmove(str[i] + count, str[i], strlen(str) + 1);
+				memmove(str[i] + count, str[i], strlen(str) + count);
 				memset(str[i], '+', count);
+				printf("%s", str[i]);
+				printf("\n");
 			}
 			else {
 				int temp = 0;
@@ -48,54 +57,100 @@ int main()
 					}
 					strcpy(word, &str[i][j]);
 				}
-				printf("%s\n", word);
+				printf("word: %s\n", word);
 			}
-			printf("%s", str[i]);
-			printf("\n");
 		}
 
 		// освобождение динамической памяти
-		for (i = 0; i < k; i++)
+		free(str);
+		/*for (i = 0; i < k; i++)
 		{
 			free(str[i]);
 			str[i] = 0;
-		}
+		}*/
 		// system("pause");
 		return 0;
 }
-*/
+
+/*
 //2
+// n - rows
+// m - columns
+int* cnt_dig(float** mat, int* arr, int n, int m) {
+	printf("=========================\n");
+	int i = 0, j = 0, min = 0, max = 0;
+	for (j = 0; j < (n + 1) / 2; j++) {
+		for (i = j; i < n + 1 - i; i++) {
+			printf("%.2f\t", mat[i][j]);
+			if (&mat[j][i] < min) {
+				min = mat[j][i];
+			}
+		}
+		printf("\n");
+	}
+
+	printf("Next:\n");
+
+	for (j = (n + 1) / 2; j < n; j++){
+		for (i = n + 1 - j; i < j; i++) {
+			printf("%.2f\t", mat[j][i]);
+			if (&mat[j][i] > max) {
+				max = &mat[j][i];
+			}
+		}
+		printf("\n");
+	}
+
+	//for (i = n / 2; i < n; i++) {
+	//	for (j = 1; j < m; j+2) {
+	//		printf("%f\n", mat[j][i]);
+	//		if (&mat[j][i] > max) {
+	//			max = &mat[j][i];
+	//		}
+	//	}
+	//}
+
+	arr[0] = min;
+	arr[1] = max;
+
+	return arr;
+}
 
 int main()
 {
 	system("chcp 1251");
 	srand(time(NULL));
-	float **mat;
-	int n;
-	int m;
+	float** mat;
+	int n, m, i = 0, j = 0;
+	int* arr;
+	arr = (int*)malloc(2 * sizeof(int));
 	printf("Введите n и m\n");
-	printf("n:");
-	scanf(" %d", &n);
-	printf("\nm:");
-	scanf(" %d", &m);
-	printf("\n");
-	mat = (int**)malloc(sizeof(int*) * n);
-	for (int i = 0; i < n; i++) {
-		mat[i] = (int*)malloc(m * sizeof(int));
+	printf("n: ");
+	scanf("%d", &n);
+	printf("m: ");
+	scanf("%d", &m);
+	
+	mat = (float**)malloc(sizeof(float*) * n);
+	for (i = 0; i < n; i++) {
+		mat[i] = (float*)malloc(m * sizeof(float)); // Выделение памяти
 	}
-	for (int i = 0; i < n; i++) 
+
+	for (i = 0; i < n; i++)
+		for (j = 0; j < m; j++)
+			mat[i][j] = (rand() % 20 - 10.0) / 10;// Заполнение матрицы
+
+	for (i = 0; i < n; i++)
 	{
-		for (int j = 0; j < m; j++)
-		{
-			mat[i][j] = rand() % 20 - 10;
-			printf("%f\t", mat[i][j]);
-		}
+		for (j = 0; j < m; j++)
+			printf("%.2f\t", mat[i][j]); // Вывод матрицы
 		printf("\n");
 	}
 
+	cnt_dig(mat, arr, n, m);
+
+	printf("min: %d\n", arr[0]);
+	printf("max: \n", arr[1]);
+
 	// Очищение матрицы
-	for (int i = 0; i < N; i++) {
-		free(mat[i]);
-	}
 	free(mat);
-}
+}*/
