@@ -18,57 +18,55 @@ int main()
 	int i, j, k;
 	//динамическую память запрашиваем для каждой строки в цикле
 	printf("Введите несколько строк, окончание ввода - слово yes\n");
-		for (k = 0; buff[0]; k++)
-		{
-			// ввод строки в буфер
-			gets(buff);
-			if (!strcmp(buff, "yes")) {
-				break;
-			}
-			// выделение динамической памяти под строку
-			str[k] = (char*)malloc(strlen(buff) + 1);
-			// копирование строки в динамическую память
-			strcpy(str[k], buff);
+	for (k = 0; buff[0]; k++)
+	{
+		// ввод строки в буфер
+		gets(buff);
+		if (!strcmp(buff, "yes")) {
+			break;
 		}
-		
-		printf("====================\n");
+		// выделение динамической памяти под строку
+		str[k] = (char*)malloc(strlen(buff) + 1);
+		// копирование строки в динамическую память
+		strcpy(str[k], buff);
+	}
 
-		for (i = 0; i < strlen(str); i++) {
-			if ((i + 1) % 2 == 0)
-			{
-				size_t count = 1;
-				memmove(str[i] + count, str[i], strlen(str) + count);
-				memset(str[i], '+', count);
-				printf("%s", str[i]);
-				printf("\n");
-			}
-			else {
-				int last = 0;
-				char word[20];
-				for (j = 0; j < strlen(str[i]) - 1; j++)
-				{
-					if (!strcmp(" ", &str[i][j]))
-					{
-						for (int k = last; k < j; k++) {
-							strcpy(word, &str[i][k]);
-						}
-						last = j;
-					}
-					printf("word: %s\n", word);
-				}
-				
-			}
-		}
+	printf("====================\n");
 
-		// освобождение динамической памяти
-		free(str);
-		/*for (i = 0; i < k; i++)
+	for (i = 0; i < strlen(str); i++) {
+		if ((i + 1) % 2 == 0)
 		{
-			free(str[i]);
-			str[i] = 0;
-		}*/
-		// system("pause");
-		return 0;
+			size_t count = 1;
+			memmove(str[i] + count, str[i], strlen(str) + count);
+			memset(str[i], '+', count);
+			printf("%s", str[i]);
+			printf("\n");
+		}
+		else {
+			char* words = strtok(str[i], " ");
+			int last = 0;
+			//for (j = 0; j < strlen(str[i]) - 1; j++)
+			//{
+				//if (!strcmp(" ", &str[i][j]))
+				//{
+				//	for (int k = last; k < j; k++) {
+				//		strcpy(word, &str[i][k]);
+				//	}
+				//	last = j;
+				//}
+				printf("word: %s\n", words);
+			//}
+		}
+	}
+	// освобождение динамической памяти
+	free(str);
+	/*for (i = 0; i < k; i++)
+	{
+		free(str[i]);
+		str[i] = 0;
+	}*/
+	// system("pause");
+	return 0;
 }
 
 /*
@@ -128,7 +126,7 @@ int main()
 	scanf("%d", &n);
 	printf("m: ");
 	scanf("%d", &m);
-	
+
 	mat = (float**)malloc(sizeof(float*) * n);
 	for (i = 0; i < n; i++) {
 		mat[i] = (float*)malloc(m * sizeof(float)); // Выделение памяти
