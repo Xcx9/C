@@ -17,16 +17,19 @@ int main()
 
 	printf("Введите несколько строк, окончание ввода - слово yes\n");
 	do {
-		gets(buff);
-		if (*buff == '\0') {
-			printf("Не стоит вводить ничего. Попробуйте еще раз...\n");
-		}
-		else {
-			str = (char**)realloc(str, (k + 1) * sizeof(char*));
-			str[k] = (char*)malloc(strlen(buff) + 1);
-			strcpy(str[k], buff);
-			k++;
-		}
+	gets(buff);
+	if (*buff == '\0') {
+		printf("Не стоит вводить ничего. Попробуйте еще раз...\n");
+	}
+	else if(*buff == ' ') {
+		printf("Не стоит начинать с пробела, попробуйте с букв! :)\n");
+	}
+	else {
+		str = (char**)realloc(str, (k + 1) * sizeof(char*));
+		str[k] = (char*)malloc(strlen(buff) + 1);
+		strcpy(str[k], buff);
+		k++;
+	}
 	} while (strcmp(buff, "yes"));
 
 	printf("====================\n");
