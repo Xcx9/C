@@ -3,69 +3,80 @@
 #include <stdlib.h>
 #include <time.h>
 #include <Windows.h>
-#define N 10
 
-//char* set_smth(char *str) {
-//	return '\0';
+//char** set_smth(char **str, int k) {
+//	return str;
 //}
 
 // максимальное количество динамических строк
 int main()
 {
 	system("chcp 1251");
-	char* str[N]; // статический массив указателей для адресации динамических строк
-	char buff[N] = { 'q' };// буфер для ввода строки
-	int i, j, k;
+	char** str; // статический массив указателей для адресации динамических строк
+	str = (char**)malloc(sizeof(char*));
+	char* buff = {' '};// буфер для ввода строки
+	buff = (char*)malloc(sizeof(char));
+	int i, j, k = 0;
 	//динамическую память запрашиваем для каждой строки в цикле
 	printf("Введите несколько строк, окончание ввода - слово yes\n");
-	for (k = 0; buff[0]; k++)
-	{
-		// ввод строки в буфер
+	do {
+		int cap = k;
 		gets(buff);
-		if (!strcmp(buff, "yes")) {
-			break;
-		}
+		//str = (char**)realloc(str, sizeof(char*));
+		str[k] = (char*)malloc(strlen(buff) + 2);
+		*strcpy(str[k], buff);
 		// выделение динамической памяти под строку
-		str[k] = (char*)malloc(strlen(buff) + 1);
-		// копирование строки в динамическую память
-		strcpy(str[k], buff);
-	}
-
+		k++;
+	} while (strcmp(buff, "yes"));
+	// копирование строки в динамическую память
 	printf("====================\n");
 
-	for (i = 0; i < strlen(str); i++) {
+	for (i = 0; i < k; i++) {
 		if ((i + 1) % 2 == 0)
 		{
 			size_t count = 1;
-			memmove(str[i] + count, str[i], strlen(str) + count);
+			memmove(str[i] + count, str[i], strlen(str[i]) + count);
 			memset(str[i], '+', count);
 			printf("%s", str[i]);
 			printf("\n");
 		}
 		else {
-			char* words = strtok(str[i], " ");
+			int cnt = 0;
+			char* word;
 			int last = 0;
-			//for (j = 0; j < strlen(str[i]) - 1; j++)
-			//{
-				//if (!strcmp(" ", &str[i][j]))
-				//{
-				//	for (int k = last; k < j; k++) {
-				//		strcpy(word, &str[i][k]);
-				//	}
-				//	last = j;
+			char* words;
+			word = (char*)malloc(sizeof(char));
+			words = (char*)malloc(sizeof(str[i]) * 2);
+			do {
+				word = (cnt == 0 ? strtok(str[i], " ") : strtok(NULL, " "));
+				printf("word:%s\n", word);
+				printf("words1:%s\n", words);
+
+				*strcpy(*words, *word);
+				printf("words2:%s\n", words);
+				strcat(words, ' ');
+				printf("words2:%s\n", words);
+				system("pause");
+				*strcat(*words, *word);
+				strcat(words, ' ');
+				//printf("%s", word);
+				//char* word;
+				//word = (char*)malloc(ind - last);
+				//for (int j = last; j < ind; k++) {
+					//strcpy(word[k], &str[i][k]);
 				//}
-				printf("word: %s\n", words);
-			//}
+				//last = ind;
+				printf("words: %s\n", words);
+				cnt++;
+			} while (word != NULL);
+			strcpy(str[i], words);
+			printf("new_string:%s", str[i]);
 		}
 	}
 	// освобождение динамической памяти
-	free(str);
-	/*for (i = 0; i < k; i++)
-	{
+	for (int i = 0; i < k; i++) {
 		free(str[i]);
-		str[i] = 0;
-	}*/
-	// system("pause");
+	}
 	return 0;
 }
 
