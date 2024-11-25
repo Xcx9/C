@@ -4,7 +4,8 @@
 #include <time.h>
 #include <Windows.h>
 
-char** set_smth(char** str, int k);
+
+/*char** set_smth(char** str, int k);
 
 int main()
 {
@@ -17,19 +18,19 @@ int main()
 
 	printf("Введите несколько строк, окончание ввода - слово yes\n");
 	do {
-	gets(buff);
-	if (*buff == '\0') {
-		printf("Не стоит вводить ничего. Попробуйте еще раз...\n");
-	}
-	else if(*buff == ' ') {
-		printf("Не стоит начинать с пробела, попробуйте с букв! :)\n");
-	}
-	else {
-		str = (char**)realloc(str, (k + 1) * sizeof(char*));
-		str[k] = (char*)malloc(strlen(buff) + 1);
-		strcpy(str[k], buff);
-		k++;
-	}
+		gets(buff);
+		if (*buff == '\0') {
+			printf("Не стоит вводить ничего. Попробуйте еще раз...\n");
+		}
+		else if(*buff == ' ') {
+			printf("Не стоит начинать с пробела, попробуйте с букв! :)\n");
+		}
+		else {
+			str = (char**)realloc(str, (k + 1) * sizeof(char*));
+			str[k] = (char*)malloc(strlen(buff) + 1);
+			strcpy(str[k], buff);
+			k++;
+		}
 	} while (strcmp(buff, "yes"));
 
 	printf("====================\n");
@@ -52,7 +53,7 @@ char** set_smth(char** str, int k) {
 			int cnt = 0;
 			char* word;
 			char* words = (char*)malloc(strlen(str[i]) * 2 + 1);
-			words[0] = '\0'; // Инициализируем words как пустую строку
+			words[0] = '\0';
 
 			word = strtok(str[i], " ");
 			while (word != NULL) {
@@ -70,50 +71,14 @@ char** set_smth(char** str, int k) {
 	}
 	return str;
 }
+*/
 
-/*
+
+
 //2
 // n - rows
 // m - columns
-int* cnt_dig(float** mat, int* arr, int n, int m) {
-	printf("=========================\n");
-	int i = 0, j = 0, min = 0, max = 0;
-	for (j = 0; j < (n + 1) / 2; j++) {
-		for (i = j; i < n + 1 - i; i++) {
-			printf("%.2f\t", mat[i][j]);
-			if (&mat[j][i] < min) {
-				min = mat[j][i];
-			}
-		}
-		printf("\n");
-	}
-
-	printf("Next:\n");
-
-	for (j = (n + 1) / 2; j < n; j++){
-		for (i = n + 1 - j; i < j; i++) {
-			printf("%.2f\t", mat[j][i]);
-			if (&mat[j][i] > max) {
-				max = &mat[j][i];
-			}
-		}
-		printf("\n");
-	}
-
-	//for (i = n / 2; i < n; i++) {
-	//	for (j = 1; j < m; j+2) {
-	//		printf("%f\n", mat[j][i]);
-	//		if (&mat[j][i] > max) {
-	//			max = &mat[j][i];
-	//		}
-	//	}
-	//}
-
-	arr[0] = min;
-	arr[1] = max;
-
-	return arr;
-}
+int* cnt_dig(float** mat, float* arr, int n, int m);
 
 int main()
 {
@@ -121,8 +86,8 @@ int main()
 	srand(time(NULL));
 	float** mat;
 	int n, m, i = 0, j = 0;
-	int* arr;
-	arr = (int*)malloc(2 * sizeof(int));
+	float* arr;
+	arr = (float*)malloc(2 * sizeof(float));
 	printf("Введите n и m\n");
 	printf("n: ");
 	scanf("%d", &n);
@@ -131,25 +96,65 @@ int main()
 
 	mat = (float**)malloc(sizeof(float*) * n);
 	for (i = 0; i < n; i++) {
-		mat[i] = (float*)malloc(m * sizeof(float)); // Выделение памяти
+		mat[i] = (float*)malloc(m * sizeof(float));
 	}
 
 	for (i = 0; i < n; i++)
 		for (j = 0; j < m; j++)
-			mat[i][j] = (rand() % 20 - 10.0) / 10;// Заполнение матрицы
+			mat[i][j] = (rand() % 20 - 10.0) / 10;
 
 	for (i = 0; i < n; i++)
 	{
 		for (j = 0; j < m; j++)
-			printf("%.2f\t", mat[i][j]); // Вывод матрицы
+			printf("%.2f\t", mat[i][j]);
 		printf("\n");
 	}
 
 	cnt_dig(mat, arr, n, m);
 
-	printf("min: %d\n", arr[0]);
-	printf("max: \n", arr[1]);
+	printf("min: %f\n", arr[0]);
+	printf("max: %f\n", arr[1]);
 
-	// Очищение матрицы
+
 	free(mat);
-}*/
+}
+
+int* cnt_dig(float** mat, int* arr, int n, int m) {
+	int i = 0, j = 0, k = 0, ser = (m - 1) / 2;
+	float min = mat[0][0], max = mat[0][0];
+	//printf("=========================\n");
+	//printf("Left:\n");
+	for (j; j < (m + 1) / 2; j++) { // columns
+		for (i = j; i < n - k; i++) { // rows
+			//printf("%.2f\t", mat[i][j]);
+			if (mat[i][j] < min) {
+				min = mat[i][j];
+			}
+		}
+		k += 1;
+		printf("\n");
+	}
+
+	//printf("Right:\n");
+	k = ser + 1;
+	for (j = (n - 1) / 2; j < n; j++) { // rows
+		for (i = ser; i < k; i++) { // columns
+			//printf("[%d] [%d] %.2f\t", i, j, mat[i][j]);
+			if (mat[i][j] > max) {
+				max = mat[i][j];
+			}
+		}
+		ser -= 1;
+		k += 1;
+		printf("\n");
+	}
+
+	for (i; i < 2; i++) {
+		printf("arr[%d]: %f\n", i, arr[i]);
+	}
+
+	arr[0] = min;
+	arr[1] = max;
+
+	return arr;
+}
