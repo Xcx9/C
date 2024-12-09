@@ -1,4 +1,4 @@
-define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,16 +13,18 @@ typedef struct
 
 void Add_Stud(Student* arr, int i);
 void print(Student* arr, int n);
+void find_by_direction(Student* arr, int n, char* direction);
+void find_by_group(Student* arr, int n, char* direction, int group);
 
 int main()
 {
     system("chcp 1251");
     int n = 0;
-    int capacity = 2;
-    Student* studs = (Student*)malloc(capacity * sizeof(Student));
+    int cap = 2;
+    Student* studs = (Student*)malloc(cap * sizeof(Student));
 
     printf("Чтобы добавить студента, его направление и группу введите 'Добавить', окончание ввода - слово 'Все'\n");
-    char buff[100]; // буфер для ввода
+    char buff[100];
 
     while (1) {
         printf("Введите что-нибудь для добавления студента или 'Все' для завершения: ");
@@ -32,15 +34,43 @@ int main()
             break;
         }
 
-        if (n >= capacity) {
-           capacity *= 2;
-           studs = (Student*)realloc(studs, capacity * sizeof(Student));
+        if (n >= cap) {
+            cap *= 2;
+            studs = (Student*)realloc(studs, cap * sizeof(Student));
         }
         Add_Stud(studs, n);
         n++;
     }
 
+    // Вывод студентов
     print(studs, n);
+    int search;
+    printf("Выберите тип поиска\nПо направлению - 1\nПо группе и направлению - 2\nЧтобы ничего не искать введите что-то кроме 1 и 2");
+    scanf(search);
+
+    switch (search)
+    {
+    case 1:
+        // Поиск по направлению
+        printf("\nВведите направление подготовки для поиска: ");
+        char direction[100];
+        gets(direction);
+        find_by_direction(studs, n, direction);
+
+    case 2:   
+        // Поиск по группе и направлению
+        printf("\nВведите направление подготовки для поиска: ");
+        char direction[100];
+        gets(direction);
+        printf("Введите номер группы: ");
+        int group;
+        scanf("%d", &group);
+        getchar();
+        find_by_group(studs, n, direction, group);
+
+    default:
+        break;
+    }
 
     for (int i = 0; i < n; i++) {
         free(studs[i].name);
@@ -76,4 +106,51 @@ void print(Student* arr, int n)
     {
         printf("Имя: %s Фамилия: %s Направление: %s Группа: %d\n", arr[i].name, arr[i].surname, arr[i].direction, arr[i].group);
     }
+}
+
+void find_by_direction(Student* arr, int n, char* direction)
+{
+    printf("\nСтуденты по направлению '%s':\n", direction);
+    for (int i = 0; i < n; i++)
+    {
+        if (!strcmp(arr[i].direction, direction))
+        {
+            printf("Имя: %s Фамилия: %s Группа: %d\n", arr[i].name, arr[i].surname, arr[i].group);
+        }
+    }
+}
+
+void find_by_group(Student* arr, int n, char* direction, int group)
+{
+    Student* new_arr = (Student*)malloc(n * sizeof(Student));
+    int count = 0;
+
+    for (int i = 0; i < n; i++)
+    {
+        if (!strcmp(arr[i].direction, direction) && arr[i].group == group)
+        {
+            new_arr[count++] = arr[i];
+        }
+    }
+
+    for (int i = 0; i < count - 1; i++)
+    {
+        for (int j = i + 1; j < count; j++)
+        {
+            if (strcmp(new_arr[i].name, new_arr[j].name) > 0)
+            {
+                Student temp = new_arr[i];
+                new_arr[i] = new_arr[j];
+                new_arr[j] = temp;
+            }
+        }
+    }
+
+    printf("\nСтуденты группы '%s %d':\n", direction, group);
+    for (int i = 0; i < count; i++)
+    {
+        printf("Имя: %s Фамилия: %s\n", new_arr[i].name, new_arr[i].surname);
+    }
+
+    free(new_arr);
 }
