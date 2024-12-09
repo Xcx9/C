@@ -1,0 +1,79 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+
+typedef struct
+{
+	char** name;
+	char** surname;
+	char** direction;
+	int group;
+} Student;
+
+void init(Student*, int);
+void print(Student*, int);
+void Add_Stud(Student*);
+
+int main()
+{
+	int n = 0;
+	Student* studs = (Student*)malloc(sizeof(Student));
+	system("chcp 1251");
+	char** str;
+	str = (char**)malloc(sizeof(char*));
+	char* buff = { ' ' };
+	buff = (char*)malloc(sizeof(char));
+	printf("Чтобы добавить студента, его направление и группу введите 'Добавить', окончание ввода - слово 'Все'\n");
+	do {
+		gets(buff);
+		if (*buff == ' ') {
+			printf("Не стоит начинать с пробела, попробуйте с букв! :)\n");
+		}
+		else {
+			if (n > sizeof(Student)) {
+				studs = (Student*)realloc(studs, 2 * sizeof(Student));
+			}
+			Add_Stud(studs, n);
+			n += 1;
+		}
+	} while (strcmp(buff, "Все"));
+
+	print(studs, n);
+
+	free(studs);
+}
+
+
+void Add_Stud(Student* arr, int i)
+{
+	char* name = (char*)malloc(sizeof(char));
+	char* surname = (char*)malloc(sizeof(char));
+	char* direction = (char*)malloc(sizeof(char));
+	int group;
+
+	
+	
+	printf("\nВведите имя: ");
+	gets(name);
+	printf("\nВведите фамилию: ");
+	gets(surname);
+	printf("\nВведите направление: ");
+	gets(direction);
+	printf("\nВведите номер группы: ");
+	scanf("%d", &group);
+	strcpy(arr[i].name, name);
+	strcpy(arr[i].surname, surname);
+	strcpy(arr[i].direction, direction);
+	arr[i].group = group;
+}
+
+void print(Student* arr, int n)
+{
+	int i;
+	for (i = 0; i < n; i++)
+	{
+		printf("%10s %10s %10s %d\n", arr[i].name, arr[i].surname, arr[i].direction, arr[i].group);
+	}
+}
