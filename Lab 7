@@ -12,7 +12,7 @@ typedef struct
 typedef struct
 {
     int day;
-    int month;
+    char* month;
     int year;
 } Date;
 
@@ -28,6 +28,8 @@ void Add_Stud(Student* arr, int i);
 void print(Student* arr, int n);
 void find_by_direction(Student* arr, int n, char* direction);
 void find_by_group(Student* arr, int n, char* direction, int group);
+void writeFile(char filename[], Student* arr, int n);
+Student* readFile(char filename[], int* n);
 
 int main()
 {
@@ -35,26 +37,31 @@ int main()
     int n = 0;
     int cap = 2;
     Student* studs = (Student*)malloc(cap * sizeof(Student));
+    if (readFile("stud") == NULL) {
+        printf("Чтобы добавить студента, его направление и группу введите 'Добавить', окончание ввода - слово 'Все'\n");
+        char* buff = { ' ' };
+        buff = (char*)malloc(sizeof(char));
 
-    printf("Чтобы добавить студента, его направление и группу введите 'Добавить', окончание ввода - слово 'Все'\n");
-    char* buff = { ' ' };
-    buff = (char*)malloc(sizeof(char));
+        while (1) {
+            printf("Введите что-нибудь для добавления студента или 'все' для завершения: ");
+            gets(buff);
 
-    while (1) {
-        printf("Введите что-нибудь для добавления студента или 'все' для завершения: ");
-        gets(buff);
+            if (!strcmp(buff, "все")) {
+                break;
+            }
 
-        if (!strcmp(buff, "все")) {
-            break;
+            if (n >= cap) {
+                cap *= 2;
+                studs = (Student*)realloc(studs, cap * sizeof(Student));
+            }
+            Add_Stud(studs, n);
+            n++;
         }
-
-        if (n >= cap) {
-            cap *= 2;
-            studs = (Student*)realloc(studs, cap * sizeof(Student));
-        }
-        Add_Stud(studs, n);
-        n++;
     }
+    else {
+        readFile("stud");
+    }
+    
 
     // Вывод студентов
     print(studs, n);
@@ -84,7 +91,7 @@ int main()
     default:
         break;
     }
-
+    writeFile("studs", studs, n);
     for (int i = 0; i < n; i++) {
         free(studs[i].fio.name);
         free(studs[i].fio.surname);
@@ -178,10 +185,11 @@ void writeFile(char filename[], Student* arr, int n)
         perror("Some problems with file: ");
 }
 
-Student* readFile(char filename[], int* n)
+Student* readFile(char filename[])
 {
     Student temp = { "" }, * res = NULL;
     int i;
+    int* n;
     FILE* fp = fopen(filename, "r");
     if (fp)
     {
