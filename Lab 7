@@ -37,7 +37,7 @@ int main()
     int n = 0;
     int cap = 2;
     Student* studs = (Student*)malloc(cap * sizeof(Student));
-    if (readFile("stud") == NULL) {
+    if (access("stud", 0) != 0) {
         printf("Чтобы добавить студента, его направление и группу введите 'Добавить', окончание ввода - слово 'Все'\n");
         char* buff = { ' ' };
         buff = (char*)malloc(sizeof(char));
@@ -59,12 +59,13 @@ int main()
         }
     }
     else {
-        readFile("stud");
+        studs = readFile("stud", n);
     }
-    
+
 
     // Вывод студентов
     print(studs, n);
+    writeFile("stud", studs, n);
     int search;
     printf("Выберите тип поиска\nПо направлению - 1\nПо группе и направлению - 2\nЧтобы ничего не искать введите что-то кроме 1 и 2\n");
     scanf("%d", &search);
@@ -176,35 +177,32 @@ void writeFile(char filename[], Student* arr, int n)
     if (fp)
     {
         for (i = 0; i < n; i++)
-            fprintf(fp, "%15s %15s %lf %d %d %d %d\n", arr[i].fio.name, arr[i].fio.surname,
+            fprintf(fp, "%s %s %d %s %d %s %d\n", arr[i].fio.name, arr[i].fio.surname,
                 arr[i].date.day, arr[i].date.month,
-                arr[i].date.year);
+                arr[i].date.year, arr[i].direction, arr[i].group);
         fclose(fp);
     }
     else
         perror("Some problems with file: ");
 }
 
-Student* readFile(char filename[])
+Student* readFile(char filename[], int n)
 {
     Student temp = { "" }, * res = NULL;
     int i;
-    int* n;
     FILE* fp = fopen(filename, "r");
     if (fp)
     {
-        *n = 0;
-        while (fscanf(fp, "%15s %15s %lf %d %d %d %d\n", temp.fio.name, temp.fio.surname,
-            &temp.date.day, &temp.date.month,
-            &temp.date.year) != -1)
-            (*n)++;
-        res = (Student*)malloc((*n) * sizeof(Student));
-        //fseek(fp, 0, SEEK_SET);
+        n = 0;
+        while (fscanf(fp, "%s %s(%d-%d-%d): %s %d  \n", temp.fio.name, temp.fio.surname,
+            &temp.date.day, &temp.date.month, &temp.date.year, &temp.direction, &temp.group) != -1);
+            n++;
+        res = (Student*)malloc(n * sizeof(Student));
+        fseek(fp, 0, SEEK_SET);
         rewind(fp);
-        for (i = 0; i < *n; i++)
-            fscanf(fp, "%15s %15s %lf %d %d %d %d\n", res[i].fio.name, res[i].fio.surname,
-                &res[i].date.day, &res[i].date.month,
-                &res[i].date.year);
+        for (i = 0; i < n; i++)
+            fscanf(fp, "%s %s(%d-%d-%d): %s %d  \n", temp.fio.name, temp.fio.surname,
+                &temp.date.day, &temp.date.month, &temp.date.year, &temp.direction, &temp.group);
         fclose(fp);
     }
     else perror("Some problems with file: ");
