@@ -11,23 +11,14 @@ typedef struct
 
 typedef struct
 {
-    int day;
-    char* month;
-    int year;
-} Date;
-
-typedef struct
-{
     Fio fio;
-    Date date;
     char* direction;
-    int group;
 } Student;
 
 void Add_Stud(Student* arr, int i);
 void print(Student* arr, int n);
 void find_by_direction(Student* arr, int n, char* direction);
-void find_by_group(Student* arr, int n, char* direction, int group);
+void find_by_name_surname(Student* arr, int n, char* name, char* surname);
 void writeFile(char filename[], Student* arr, int n);
 Student* readFile(char filename[], int* n);
 
@@ -64,11 +55,13 @@ int main()
     // Вывод студентов
     print(studs, n);
     int search;
-    printf("Выберите тип поиска\nПо направлению - 1\nПо группе и направлению - 2\nЧтобы ничего не искать введите что-то кроме 1 и 2\n");
+    printf("Выберите тип поиска\nПо направлению - 1\nПо имени и фамилии - 2\nЧтобы ничего не искать введите что-то кроме 1 и 2\n");
     scanf("%d", &search);
     getchar(); // Consume newline character
 
     char direction[100];
+    char name[100];
+    char surname[100];
 
     switch (search)
     {
@@ -80,15 +73,14 @@ int main()
         find_by_direction(studs, n, direction);
         break;
     case 2:
-        // Поиск по группе и направлению
-        printf("Введите направление: ");
-        fgets(direction, sizeof(direction), stdin);
-        direction[strcspn(direction, "\n")] = 0; // Remove newline character
-        printf("\nВведите номер группы: ");
-        int group;
-        scanf("%d", &group);
-        getchar(); // Consume newline character
-        find_by_group(studs, n, direction, group);
+        // Поиск по имени и фамилии
+        printf("Введите имя: ");
+        fgets(name, sizeof(name), stdin);
+        name[strcspn(name, "\n")] = 0; // Remove newline character
+        printf("Введите фамилию: ");
+        fgets(surname, sizeof(surname), stdin);
+        surname[strcspn(surname, "\n")] = 0; // Remove newline character
+        find_by_name_surname(studs, n, name, surname);
         break;
     default:
         break;
@@ -99,7 +91,6 @@ int main()
     for (int i = 0; i < n; i++) {
         free(studs[i].fio.name);
         free(studs[i].fio.surname);
-        free(studs[i].date.month);
         free(studs[i].direction);
     }
     free(studs);
@@ -111,7 +102,6 @@ void Add_Stud(Student* arr, int i)
 {
     arr[i].fio.name = (char*)malloc(100 * sizeof(char));
     arr[i].fio.surname = (char*)malloc(100 * sizeof(char));
-    arr[i].date.month = (char*)malloc(20 * sizeof(char)); // Allocate memory for month
     arr[i].direction = (char*)malloc(100 * sizeof(char));
 
     printf("\nВведите имя: ");
@@ -122,25 +112,9 @@ void Add_Stud(Student* arr, int i)
     fgets(arr[i].fio.surname, 100, stdin);
     arr[i].fio.surname[strcspn(arr[i].fio.surname, "\n")] = 0; // Remove newline character
 
-    printf("Введите год рождения: ");
-    scanf("%d", &arr[i].date.year);
-    getchar(); // Consume newline character
-
-    printf("Введите месяц рождения: ");
-    fgets(arr[i].date.month, 20, stdin);
-    arr[i].date.month[strcspn(arr[i].date.month, "\n")] = 0; // Remove newline character
-
-    printf("Введите число рождения: ");
-    scanf("%d", &arr[i].date.day);
-    getchar(); // Consume newline character
-
     printf("Введите направление: ");
     fgets(arr[i].direction, 100, stdin);
     arr[i].direction[strcspn(arr[i].direction, "\n")] = 0; // Remove newline character
-
-    printf("Введите номер группы: ");
-    scanf("%d", &arr[i].group);
-    getchar(); // Consume newline character
 }
 
 void print(Student* arr, int n)
@@ -148,9 +122,8 @@ void print(Student* arr, int n)
     printf("\nСписок студентов:\n");
     for (int i = 0; i < n; i++)
     {
-        printf("%s %s(%d %s %d): %s  %d\n", arr[i].fio.name, arr[i].fio.surname,
-            arr[i].date.day, arr[i].date.month,
-            arr[i].date.year, arr[i].direction, arr[i].group);
+        printf("%s %s: %s\n", arr[i].fio.name, arr[i].fio.surname,
+            arr[i].direction);
     }
 }
 
@@ -161,42 +134,23 @@ void find_by_direction(Student* arr, int n, char* direction)
     {
         if (strcmp(arr[i].direction, direction) == 0)
         {
-            printf("%s %s(%d %s %d): %s  %d\n", arr[i].fio.name, arr[i].fio.surname,
-                arr[i].date.day, arr[i].date.month,
-                arr[i].date.year, arr[i].direction, arr[i].group);
+            printf("%s %s: %s\n", arr[i].fio.name, arr[i].fio.surname,
+                arr[i].direction);
         }
     }
 }
 
-void find_by_group(Student* arr, int n, char* direction, int group)
+void find_by_name_surname(Student* arr, int n, char* name, char* surname)
 {
-    Student* new_arr = (Student*)malloc(n * sizeof(Student));
-    int cnt = 0;
-
-    for (int i = 0; i < n; i++) {
-        if (strcmp(arr[i].direction, direction) == 0 && arr[i].group == group) {
-            new_arr[cnt++] = arr[i];
+    printf("\nСтуденты с именем '%s' и фамилией '%s':\n", name, surname);
+    for (int i = 0; i < n; i++)
+    {
+        if (strcmp(arr[i].fio.name, name) == 0 && strcmp(arr[i].fio.surname, surname) == 0)
+        {
+            printf("%s %s: %s\n", arr[i].fio.name, arr[i].fio.surname,
+                arr[i].direction);
         }
     }
-
-    for (int i = 0; i < cnt - 1; i++) {
-        for (int j = 0; j < cnt - i - 1; j++) {
-            if (strcmp(new_arr[j].fio.name, new_arr[j + 1].fio.name) > 0) {
-                Student temp = new_arr[j];
-                new_arr[j] = new_arr[j + 1];
-                new_arr[j + 1] = temp;
-            }
-        }
-    }
-
-    printf("\nСтуденты группы '%s %d':\n", direction, group);
-    for (int i = 0; i < cnt; i++) {
-        printf("%s %s(%d.%s.%d): %s %d\n", new_arr[i].fio.name, new_arr[i].fio.surname,
-            new_arr[i].date.day, new_arr[i].date.month,
-            new_arr[i].date.year, new_arr[i].direction, new_arr[i].group);
-    }
-
-    free(new_arr);
 }
 
 void writeFile(char filename[], Student* arr, int n)
@@ -205,9 +159,8 @@ void writeFile(char filename[], Student* arr, int n)
     if (fp)
     {
         for (int i = 0; i < n; i++)
-            fprintf(fp, "%s %s %d %s %d %s %d\n", arr[i].fio.name, arr[i].fio.surname,
-                arr[i].date.day, arr[i].date.month,
-                arr[i].date.year, arr[i].direction, arr[i].group);
+            fprintf(fp, "%s %s %s\n", arr[i].fio.name, arr[i].fio.surname,
+                arr[i].direction);
         fclose(fp);
     }
     else
@@ -232,12 +185,10 @@ Student* readFile(char filename[], int* n)
             }
             res[*n].fio.name = (char*)malloc(100 * sizeof(char));
             res[*n].fio.surname = (char*)malloc(100 * sizeof(char));
-            res[*n].date.month = (char*)malloc(20 * sizeof(char));
             res[*n].direction = (char*)malloc(100 * sizeof(char));
 
-            if (fscanf(fp, "%s %s %d %s %d %s %d\n", res[*n].fio.name, res[*n].fio.surname,
-                &res[*n].date.day, res[*n].date.month,
-                &res[*n].date.year, res[*n].direction, &res[*n].group) != 7)
+            if (fscanf(fp, "%s %s %s\n", res[*n].fio.name, res[*n].fio.surname,
+                res[*n].direction) != 3)
                 break;
             (*n)++;
         }
