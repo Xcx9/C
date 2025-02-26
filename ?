@@ -35,7 +35,7 @@ int main()
         while (1) {
             printf("Введите что-нибудь для добавления студента или 'все' для завершения: ");
             fgets(buff, sizeof(buff), stdin);
-            buff[strcspn(buff, "\n")] = 0; // Remove newline character
+            buff[strcspn(buff, "\n")] = 0;
 
             if (strcmp(buff, "все") == 0) {
                 break;
@@ -57,7 +57,7 @@ int main()
     int search;
     printf("Выберите тип поиска\nПо направлению - 1\nПо имени и фамилии - 2\nЧтобы ничего не искать введите что-то кроме 1 и 2\n");
     scanf("%d", &search);
-    getchar(); // Consume newline character
+    getchar();
 
     char direction[100];
     char name[100];
@@ -69,17 +69,17 @@ int main()
         // Поиск по направлению
         printf("Введите направление: ");
         fgets(direction, sizeof(direction), stdin);
-        direction[strcspn(direction, "\n")] = 0; // Remove newline character
+        direction[strcspn(direction, "\n")] = 0;
         find_by_direction(studs, n, direction);
         break;
     case 2:
         // Поиск по имени и фамилии
         printf("Введите имя: ");
         fgets(name, sizeof(name), stdin);
-        name[strcspn(name, "\n")] = 0; // Remove newline character
+        name[strcspn(name, "\n")] = 0;
         printf("Введите фамилию: ");
         fgets(surname, sizeof(surname), stdin);
-        surname[strcspn(surname, "\n")] = 0; // Remove newline character
+        surname[strcspn(surname, "\n")] = 0;
         find_by_name_surname(studs, n, name, surname);
         break;
     default:
@@ -106,49 +106,52 @@ void Add_Stud(Student* arr, int i)
 
     printf("\nВведите имя: ");
     fgets(arr[i].fio.name, 100, stdin);
-    arr[i].fio.name[strcspn(arr[i].fio.name, "\n")] = 0; // Remove newline character
+    arr[i].fio.name[strcspn(arr[i].fio.name, "\n")] = 0;
 
     printf("Введите фамилию: ");
     fgets(arr[i].fio.surname, 100, stdin);
-    arr[i].fio.surname[strcspn(arr[i].fio.surname, "\n")] = 0; // Remove newline character
+    arr[i].fio.surname[strcspn(arr[i].fio.surname, "\n")] = 0;
 
     printf("Введите направление: ");
     fgets(arr[i].direction, 100, stdin);
-    arr[i].direction[strcspn(arr[i].direction, "\n")] = 0; // Remove newline character
+    arr[i].direction[strcspn(arr[i].direction, "\n")] = 0;
 }
 
 void print(Student* arr, int n)
 {
-    printf("\nСписок студентов:\n");
+    printf("\nСписок студентов:\n===============================\n");
     for (int i = 0; i < n; i++)
     {
         printf("%s %s: %s\n", arr[i].fio.name, arr[i].fio.surname,
             arr[i].direction);
     }
+    printf("===============================\n");
 }
 
 void find_by_direction(Student* arr, int n, char* direction)
 {
+    int k = 1;
     printf("\nСтуденты по направлению '%s':\n", direction);
     for (int i = 0; i < n; i++)
     {
-        if (strcmp(arr[i].direction, direction) == 0)
+        if (!strcmp(arr[i].direction, direction))
         {
-            printf("%s %s: %s\n", arr[i].fio.name, arr[i].fio.surname,
-                arr[i].direction);
+            printf("%d)%s %s\n", k, arr[i].fio.name, arr[i].fio.surname);
+            k++;
         }
     }
 }
 
 void find_by_name_surname(Student* arr, int n, char* name, char* surname)
 {
+    int k = 1;
     printf("\nСтуденты с именем '%s' и фамилией '%s':\n", name, surname);
     for (int i = 0; i < n; i++)
     {
-        if (strcmp(arr[i].fio.name, name) == 0 && strcmp(arr[i].fio.surname, surname) == 0)
+        if (!strcmp(arr[i].fio.name, name) && !strcmp(arr[i].fio.surname, surname))
         {
-            printf("%s %s: %s\n", arr[i].fio.name, arr[i].fio.surname,
-                arr[i].direction);
+            printf("%d)%s %s: %s\n", k + 1, arr[i].fio.name, arr[i].fio.surname, arr[i].direction);
+            k++;
         }
     }
 }
