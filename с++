@@ -1,4 +1,5 @@
 #include <iostream>
+using namespace std;
 
 class Student {
 private:
@@ -12,7 +13,7 @@ public:
 	Student()
 	{
 		count++;
-		std::cout << "\nDefault constructor\n";
+		cout << "\nDefault constructor\n";
 	};
 
 	~Student()
@@ -27,11 +28,11 @@ public:
 	{
 		name = (char*)malloc(100 * sizeof(char));
 		surname = (char*)malloc(100 * sizeof(char));
-		using namespace std;
+		
 		int decision;
-		do {
-			cout << "Хотите добавить студентов?(1 - Да; 2 - Нет)\n";
-			cin >> decision;
+		cout << "Хотите добавить студентов?(1 - Да; 2 - Нет)\n";
+		cin >> decision;
+		while (decision == 1) {
 			cout << "Введите фамилию студента: ";
 			cin >> surname;
 			cout << "Введите имя студента: ";
@@ -41,7 +42,9 @@ public:
 			this->name = name;
 			this->surname = surname;
 			this->group = group;
-		} while (decision == 1);
+			cout << "Хотите добавить студентов?(1 - Да; 2 - Нет)\n";
+			cin >> decision;
+		}
 	}
 
 	void print_stud(Student* arr, int n)
@@ -57,9 +60,8 @@ public:
 
 };
 
+
 int Student::count = 0;
-
-
 
 
 int main() {
@@ -69,6 +71,7 @@ int main() {
 	temp.add_stud();
 	//temp.print_stud();
 }
+
 
 void Student::printStatic()
 {
