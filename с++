@@ -1,0 +1,76 @@
+#include <iostream>
+
+class Student {
+private:
+	char* surname;
+	char* name;
+
+public:
+	int group;
+	int static count;
+
+	Student()
+	{
+		count++;
+		std::cout << "\nDefault constructor\n";
+	};
+
+	~Student()
+	{
+		free(name);
+		free(surname);
+	};
+
+	void static printStatic();
+
+	void add_stud() 
+	{
+		name = (char*)malloc(100 * sizeof(char));
+		surname = (char*)malloc(100 * sizeof(char));
+		using namespace std;
+		int decision;
+		do {
+			cout << "Хотите добавить студентов?(1 - Да; 2 - Нет)\n";
+			cin >> decision;
+			cout << "Введите фамилию студента: ";
+			cin >> surname;
+			cout << "Введите имя студента: ";
+			cin >> name;
+			cout << "Введите группу студента: ";
+			cin >> group;
+			this->name = name;
+			this->surname = surname;
+			this->group = group;
+		} while (decision == 1);
+	}
+
+	void print_stud(Student* arr, int n)
+	{
+		printf("\nСписок студентов:\n===============================\n");
+		for (int i = 0; i < n; i++)
+		{
+			printf("%s %s: %s\n", arr[i].name, arr[i].surname,
+				arr[i].group);
+		}
+		printf("===============================\n");
+	}
+
+};
+
+int Student::count = 0;
+
+
+
+
+int main() {
+	system("chcp 1251");
+	Student::printStatic();
+	Student temp;
+	temp.add_stud();
+	//temp.print_stud();
+}
+
+void Student::printStatic()
+{
+	std::cout << "====================\n"<< count << std::endl << "====================\n";
+}
