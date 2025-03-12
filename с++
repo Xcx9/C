@@ -12,8 +12,15 @@ public:
 
 	Student()
 	{
+		cout << "\nЧто-то не было введено, попробуйте еще раз\n";
+	}
+
+	Student(char* name, char*surname, int group)
+	{
 		count++;
-		cout << "\nDefault constructor\n";
+		surname = this->surname;
+		name = this->name;
+		group = this->group;
 	};
 
 	~Student()
@@ -24,27 +31,27 @@ public:
 
 	void static printStatic();
 
-	void add_stud() 
+	void add_stud()
 	{
+		char** stud;
+		int decision;
+		**stud = (char)malloc(100 * sizeof(char));
+		*stud = (char*)malloc(100 * sizeof(char));
 		name = (char*)malloc(100 * sizeof(char));
 		surname = (char*)malloc(100 * sizeof(char));
-		
-		int decision;
 		cout << "Хотите добавить студентов?(1 - Да; 2 - Нет)\n";
 		cin >> decision;
-		while (decision == 1) {
+		do {
 			cout << "Введите фамилию студента: ";
 			cin >> surname;
 			cout << "Введите имя студента: ";
 			cin >> name;
 			cout << "Введите группу студента: ";
 			cin >> group;
-			this->name = name;
-			this->surname = surname;
-			this->group = group;
+			Student stud[count](name, surname, group);
 			cout << "Хотите добавить студентов?(1 - Да; 2 - Нет)\n";
 			cin >> decision;
-		}
+		} while (decision == 1);
 	}
 
 	void print_stud(Student* arr, int n)
@@ -75,5 +82,5 @@ int main() {
 
 void Student::printStatic()
 {
-	std::cout << "====================\n"<< count << std::endl << "====================\n";
+	std::cout << "====================\n" << count << std::endl << "====================\n";
 }
