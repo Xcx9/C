@@ -1,0 +1,203 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+using namespace std;
+
+class Student 
+{
+private:
+    char* name;
+    char* surname;
+public:
+    int group;
+    char** student;
+
+    Student() 
+    {
+
+    }
+
+    ~Student() 
+    {
+        free(name);
+        free(surname);
+    }
+    void find_by_group(Student* arr, int n);
+    void find_by_name_surname(Student* arr, int n);
+   
+    friend void print(Student* arr, int n);
+    friend void Add_Stud(Student* arr, int i);
+    friend void writeFile(const char filename[], Student* arr, int n);
+    friend Student* readFile(const char filename[], int* n);
+};
+
+
+
+
+
+
+
+
+int main()
+{
+    system("chcp 1251");
+    int n = 0;
+    int cap = 2;
+    Student* studs = (Student*)malloc(cap * sizeof(Student));
+    if (fopen("stud", "r")) {
+        studs = readFile("stud", &n);
+    }
+    else {
+        printf("Файл не найден\nЧтобы добавить студента, его направление и группу введите 'Добавить', окончание ввода - слово 'Все'\n");
+        char buff[100];
+        while (1) {
+            printf("Введите что-нибудь для добавления студента или 'все' для завершения: ");
+            fgets(buff, sizeof(buff), stdin);
+            buff[strcspn(buff, "\n")] = 0;
+
+            if (strcmp(buff, "все") == 0) {
+                break;
+            }
+
+            if (n >= cap) {
+                cap *= 2;
+                studs = (Student*)realloc(studs, cap * sizeof(Student));
+            }
+            Add_Stud(studs, n);
+            n++;
+        }
+    }
+    // Вывод студентов
+    print(studs, n);
+    int search;
+    printf("Выберите тип поиска\nПо направлению - 1\nПо имени и фамилии - 2\nЧтобы ничего не искать введите что-то кроме 1 и 2\n");
+    scanf("%d", &search);
+    getchar();
+
+    switch (search)
+    {
+    case 1:
+        find_by_group(Student * arr, int n);
+        break;
+    case 2:
+        // Поиск по имени и фамилии
+        Student::find_by_name_surname();
+        break;
+    default:
+        break;
+    }
+
+    writeFile("stud", studs, n);
+
+    return 0;
+}
+
+void Add_Stud(Student* arr, int i)
+{
+    arr[i].name = (char*)malloc(100 * sizeof(char));
+    arr[i].surname = (char*)malloc(100 * sizeof(char));
+    printf("\nВведите имя: ");
+    cin >> arr[i].name;
+
+    printf("Введите фамилию: ");
+    cin >> arr[i].surname;
+
+    printf("Введите направление: ");
+    cin >> arr[i].group;
+}
+
+void print(Student* arr, int n)
+{
+    printf("\nСписок студентов:\n===============================\n");
+    for (int i = 0; i < n; i++)
+    {
+        printf("%s %s: %s\n", arr[i].name, arr[i].surname,
+            arr[i].group);
+    }
+    printf("===============================\n");
+}
+
+
+
+
+
+void writeFile(const char filename[], Student* arr, int n)
+{
+    FILE* fp = fopen(filename, "w");
+    if (fp)
+    {
+        for (int i = 0; i < n; i++)
+            fprintf(fp, "%s %s %d\n", arr[i].name, arr[i].surname,
+                arr[i].group);
+        fclose(fp);
+    }
+    else
+        perror("Some problems with file: ");
+}
+
+Student* readFile(const char filename[], int* n)
+{
+    Student* res = NULL;
+    FILE* fp = fopen(filename, "r");
+    if (fp)
+    {
+        int cap = 2;
+        res = (Student*)malloc(cap * sizeof(Student));
+        *n = 0;
+        while (1)
+        {
+            if (*n >= cap) {
+                cap *= 2;
+                res = (Student*)realloc(res, cap * sizeof(Student));
+            }
+            res[*n].name = (char*)malloc(100 * sizeof(char));
+            res[*n].surname = (char*)malloc(100 * sizeof(char));
+
+            if (fscanf(fp, "%s %s %d\n", res[*n].name, res[*n].surname,
+                res[*n].group) != 3)
+                break;
+            (*n)++;
+        }
+        fclose(fp);
+    }
+    else
+        perror("Some problems with file: ");
+
+    return res;
+}
+
+void Student::find_by_group(Student* arr, int n)
+{
+    int k = 1;
+    printf("\nСтуденты по направлению '%s':\n", group);
+    int search;
+    std::cin >> search;
+    for (int i = 0; i < n; i++)
+    {
+        if (arr[i].group == search)
+        {
+            printf("%d)%s %s\n", k, arr[i].name, arr[i].surname);
+            k++;
+        }
+    }
+}
+
+void Student::find_by_name_surname(Student* arr, int n)
+{
+    printf("Введите имя: ");
+    cin >> name;
+    printf("Введите фамилию: ");
+    cin >> surname;
+    int k = 1;
+    printf("\nСтуденты с именем '%s' и фамилией '%s':\n", name, surname);
+    for (int i = 0; i < n; i++)
+    {
+        if (!strcmp(arr[i].name, name) && !strcmp(arr[i].surname, surname))
+        {
+            printf("%d)%s %s: %s\n", k + 1, arr[i].name, arr[i].surname, arr[i].group);
+            k++;
+        }
+    }
+}
