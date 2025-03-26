@@ -1,0 +1,92 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <fstream>
+#include <cstring>
+#include <iomanip>
+
+using namespace std;
+
+class Date 
+{
+private:
+    int day;
+    int month;
+    int year;
+public:
+
+    int setDay(int day) {
+        this->day = day;
+    }
+    int setMonth(int month) {
+        this->month = month;
+    }
+    int setYear(int year) {
+        this->year = year;
+    }
+
+    int getDay(int day) {
+        return day;
+    }
+    int getMonth(int month) {
+        return month;
+    }
+    int getYear(int year) {
+        return year;
+    }
+};
+
+
+class Student
+{
+private:
+    Date birthday;
+    string name;
+    string surname;
+public:
+    int group;
+    static int stud_cnt;
+
+    
+
+    Student(string name, string surname, int group, int day, int month, int year)
+    {
+        stud_cnt++;
+        this->name = name;
+        this->surname = surname;
+        this->group = group;
+        birthday.setDay(day);
+        birthday.setMonth(month);
+        birthday.setYear(year);
+    }
+
+
+
+    Student(const Student& other) {
+        name = other.name;
+        surname = other.surname;
+        group = other.group;
+        birthday = other.birthday;
+    }
+
+
+
+    Student& operator=(const Student& other) {
+        if (this != &other) {
+            name = other.name;
+            surname = other.surname;
+            group = other.group;
+            birthday = other.birthday;
+        }
+        return *this;
+    }
+
+
+    ~Student() {}
+};
+
+
+
+int main() 
+{
+
+}
