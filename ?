@@ -16,13 +16,15 @@ public:
 
     Student() : name(nullptr), surname(nullptr), group(0) {
         stud_cnt++;
+        cout << "Кол-во студентов: " << stud_cnt << endl;
     }
 
     Student(const Student& other) {
+        stud_cnt++;
         name = other.name;
         surname = other.surname;
         group = other.group;
-        stud_cnt++;
+        
     }
 
     Student& operator=(const Student& other) {
@@ -48,9 +50,6 @@ public:
     friend void add_stud(Student* arr, int i);
     friend void writeFile(const char filename[], Student* arr, int n);
     friend Student* readFile(const char filename[], int* n);
-    static void init() {
-        cout << "Кол-во студентов: " << stud_cnt << endl;
-    }
 };
 
 int Student::stud_cnt = 0;
@@ -72,7 +71,6 @@ int main()
 
     if (fileExists("stud")) {
         Student* loaded = readFile("stud", &n);
-        delete[] studs;
         studs = loaded;
         cap = n;
     }
@@ -89,7 +87,6 @@ int main()
                 cap *= 2;
                 Student* new_studs = new Student[cap];
                 for (int i = 0; i < n; i++) new_studs[i] = studs[i];
-                delete[] studs;
                 studs = new_studs;
             }
             add_stud(studs, n);
@@ -100,21 +97,39 @@ int main()
     print(studs, n);
 
     int search;
-    cout << "Выберите тип поиска\nПо направлению - 1\nПо имени и фамилии - 2\nЧтобы ничего не искать введите что-то кроме 1 и 2\n";
+    cout << "Поиск по направлению - 1\nПоиск по имени и фамилии - 2\nДобавить еще студентов - 3\nЧтобы ничего не искать введите что-то кроме 1 и 2\n";
     cin >> search;
     cin.ignore();
 
     switch (search) {
-    case 1: 
-        find_by_group(studs, n); 
+    case 1:
+        find_by_group(studs, n);
         break;
-    case 2: 
-        find_by_name_surname(studs, n); 
+    case 2:
+        find_by_name_surname(studs, n);
         break;
+    case 3:
+        cout << "Чтобы добавить студента, его направление и группу введите 'Добавить', окончание ввода - слово 'Все'\n";
+        char buff[100];
+        while (true) {
+            cout << "Введите что-нибудь для добавления студента или 'все' для завершения: ";
+            cin.getline(buff, 100);
+
+            if (strcmp(buff, "все") == 0)
+                break;
+            if (n >= cap) {
+                cap *= 2;
+                Student* new_studs = new Student[cap];
+                for (int i = 0; i < n; i++) new_studs[i] = studs[i];
+                studs = new_studs;
+            }
+            add_stud(studs, n);
+            n++;
+            break;
+        }
     }
 
     writeFile("stud", studs, n);
-    delete[] studs;
     return 0;
 }
 
@@ -166,7 +181,6 @@ Student* readFile(const char filename[], int* n) {
                 cap *= 2;
                 Student* new_res = new Student[cap];
                 for (int i = 0; i < *n; i++) new_res[i] = res[i];
-                delete[] res;
                 res = new_res;
             }
 
@@ -189,6 +203,7 @@ Student* readFile(const char filename[], int* n) {
 
 void find_by_group(Student* arr, int n) {
     int search;
+    cout << "Введите номер искомой группы: ";
     cin >> search;
     cout << "\nСтуденты по направлению '" << search << "':\n";
     int k = 1;
