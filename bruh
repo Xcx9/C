@@ -1,0 +1,309 @@
+Даня(мелкий):
+#define _CRT_SECURE_NO_WARNINGS
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <locale>
+#include <iostream>
+
+using namespace std;
+
+class date {
+private:
+    int day;
+    int month;
+    int year;
+public:
+
+    friend ostream& operator<<(ostream& os, const date& d) {
+        os << d.getDay() << "." << d.getMonth() << "." << d.getYear();
+        return os;
+    }
+
+    bool operator==(const date& d2) {
+        return this->getDay() == d2.getDay() &&
+            this->getMonth() == d2.getMonth() &&
+            this->getYear() == d2.getYear();
+    }
+
+    date(int d = 1, int m = 1, int y = 2000) : day(d), month(m), year(y) {}
+    int getDay() const { return day; }
+    int getMonth() const { return month; }
+    int getYear() const { return year; }
+};
+
+//bool operator==(const date& d1, const date& d2) {
+//    return d1.getDay() == d2.getDay() &&
+//        d1.getMonth() == d2.getMonth() &&
+//        d1.getYear() == d2.getYear();
+//}
+
+//ostream& operator<<(ostream& os, const date& d) {
+//    os << d.getDay() << "." << d.getMonth() << "." << d.getYear();
+//    return os;
+//}
+
+class Student {
+private:
+    char* fam;
+    char* name;
+    date birthday;
+    int grup;
+    static int count;
+public:
+    Student(const char* fam, const char* name, int d, int m, int y, int grup)
+        : birthday(d, m, y), grup(grup) {
+        this->fam = new char[strlen(fam) + 1];
+        strcpy(this->fam, fam);
+        this->name = new char[strlen(name) + 1];
+        strcpy(this->name, name);
+        count++;
+    }
+
+    ~Student() {
+        delete[] fam;
+        delete[] name;
+        count--;
+    }
+
+    static int getCount() {
+        return count;
+    }
+
+    const char* getFam() const { return fam; }
+    const char* getName() const { return name; }
+    int getGrup() const { return grup; }
+    date getBirthday() const { return birthday; }
+    friend ostream& operator<<(ostream& os, const Student& s);
+};
+
+int Student::count = 0;
+
+ostream& operator<<(ostream& os, const Student& s) {
+    os << s.fam << "\t" << s.name << "\t" << s.grup << "\t" << s.birthday;
+    return os;
+}
+
+bool operator==(const Student& s, const date& d) {
+    return s.getBirthday() == d;
+}
+
+class StudentList {
+private:
+    Student** students;
+    int n;
+public:
+    StudentList() : students(nullptr), n(0) {}
+
+    ~StudentList() {
+        for (int i = 0; i < n; ++i) {
+            delete students[i];
+        }
+        delete[] students;
+    }
+
+    bool loadFromFile() {
+        FILE* file = fopen("data.txt", "r");
+        if (!file) return false;
+
+        fscanf(file, "%d", &n);
+        students = new Student * [n];
+
+        char famBuffer[256], nameBuffer[256];
+        int d, m, y, grup;
+        for (int i = 0; i < n; i++) {
+            fscanf(file, "%s %s %d %d %d %d", famBuffer, nameBuffer, &d, &m, &y, &grup);
+            students[i] = new Student(famBuffer, nameBuffer, d, m, y, grup);
+        }
+
+        fclose(file);
+        return true;
+    }
+
+    void saveToFile() {
+        FILE* file = fopen("data.txt", "w");
+        if (!file) {
+            printf("Ошибка открытия файла для записи!\n");
+            return;
+        }
+
+        fprintf(file, "%d\n", n);
+        for (int i = 0; i < n; i++) {
+            fprintf(file, "%s %s %d %d %d %d\n",
+                students[i]->getFam(),
+                students[i]->getName(),
+                students[i]->getBirthday().getDay(),
+                students[i]->getBirthday().getMonth(),
+                students[i]->getBirthday().getYear(),
+                students[i]->getGrup());
+        }
+
+        fclose(file);
+    }
+
+    void initializeWithInput() {
+        printf("Введите количество студентов: ");
+        scanf("%d", &n);
+
+        students = new Student * [n];
+        char famBuffer[256], nameBuffer[256];
+        int d, m, y, grup;
+
+        for (int i = 0; i < n; i++)
+        {
+
+
+
+            printf("Студент %d:\n", i + 1);
+            printf("Фамилия: ");
+            scanf("%s", famBuffer);
+            printf("Имя: ");
+            scanf("%s", nameBuffer);
+            printf("День рождения: ");
+            scanf("%d", &d);
+            while (d > 31)
+            {
+                printf("та не врите ");
+                scanf("%d", &d);
+            }
+
+            printf("Месяц рождения: ");
+            scanf("%d", &m);
+            while (m > 12)
+            {
+                printf("та не врите ");
+                scanf("%d", &m);
+            }
+            printf("Год рождения: ");
+            scanf("%d", &y);
+            while (y > 2025 || y < 1925)
+            {
+                printf("та не врите ");
+                scanf("%d", &y);
+            }
+            printf("Группа: ");
+            scanf("%d", &grup);
+
+            students[i] = new Student(famBuffer, nameBuffer, d, m, y, grup);
+        }
+
+        saveToFile();
+    }
+
+    void addStudent() {
+        Student** newStudents = new Student * [n + 1];
+        for (int i = 0; i < n; ++i) newStudents[i] = students[i];
+
+        char famBuffer[256], nameBuffer[256];
+        int d, m, y, grup;
+        printf("Фамилия: "); scanf("%s", famBuffer);
+        printf("Имя: ");     scanf("%s", nameBuffer);
+        printf("День рождения: "); scanf("%d", &d);
+        printf("Месяц рождения: "); scanf("%d", &m);
+        printf("Год рождения: "); scanf("%d", &y);
+        printf("Группа: ");  scanf("%d", &grup);
+
+        newStudents[n] = new Student(famBuffer, nameBuffer, d, m, y, grup);
+        delete[] students;
+        students = newStudents;
+        n++;
+        saveToFile();
+    }
+
+    void printAll() const {
+        cout << "Фамилия\tИмя\tГруппа\tДата рождения\n";
+        for (int i = 0; i < n; i++) {
+            cout << *students[i] << endl;
+        }
+        cout << "--------------------------------------------\n";
+    }
+
+    Student** findByDate(const date& targetDate, int* m) const
+    {
+        *m = 0;
+        for (int i = 0; i < n; ++i) {
+            if (*students[i] == targetDate) (*m)++;
+        }
+
+        if (*m == 0) 
+        { 
+            cout << "Таких студентов нет " << endl;
+            return nullptr; 
+
+        }
+
+        else
+        {
+            Student** result = new Student * [*m];
+            int idx = 0;
+            for (int i = 0; i < n; ++i)
+            {
+                if (*students[i] == targetDate)
+                {
+                    result[idx++] = students[i];
+                }
+            }
+
+
+
+            cout << "Найденные студенты:\n";
+            cout << "Фамилия\tИмя\tГруппа\tДата рождения\n";
+            for (int i = 0; i < *m; ++i)
+            {
+                cout << *result[i] << endl;
+            }
+
+            return result;
+        }
+    }
+};
+
+int main() {
+    setlocale(LC_ALL, "Russian");
+    StudentList list;
+
+    if (!list.loadFromFile()) {
+        printf("Файл не найден. Инициализация данных.\n");
+        list.initializeWithInput();
+    }
+
+    int option;
+    do {
+        printf("\nМеню:\n");
+        printf("1. Показать всех студентов\n");
+        printf("2. Добавить студента\n");
+        printf("3. Найти по дате рождения\n");
+        printf("4. Количество студентов\n");
+        printf("5. Выход\n");
+        printf("Выберите: ");
+        scanf("%d", &option);
+
+        int d, m, y, count;
+        Student** result;
+
+        switch (option) {
+        case 1:
+            list.printAll();
+            break;
+        case 2:
+            list.addStudent();
+            break;
+        case 3:
+            printf("Введите дату рождения (день месяц год): ");
+            scanf("%d %d %d", &d, &m, &y);
+            result = list.findByDate(date(d, m, y), &count);
+            if (result) delete[] result;
+            break;
+        case 4:
+            printf("Всего студентов: %d\n", Student::getCount());
+            break;
+        case 5:
+            printf("Выход\n");
+            break;
+        default:
+            printf("Неверный выбор\n");
+        }
+    } while (option != 5);
+
+    return 0;
+}
