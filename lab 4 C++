@@ -1,0 +1,247 @@
+#include <iostream>
+#include <fstream>
+#include <cstring>
+
+using namespace std;
+
+// Класс FIO
+class FIO {
+private:
+    string surname;
+    string name;
+public:
+    FIO() : surname(""), name("") {}
+    FIO(const string& s, const string& n) : surname(s), name(n) {}
+
+    void setSurname(const string& s) { surname = s; }
+    void setName(const string& n) { name = n; }
+    string getSurname() const { return surname; }
+    string getName() const { return name; }
+
+    void input() {
+        cout << "Фамилия: "; cin >> surname;
+        cout << "Имя: "; cin >> name;
+    }
+
+    void print() const {
+        cout << surname << " " << name;
+    }
+};
+
+// Класс Date
+class Date {
+private:
+    int day, month, year;
+public:
+    Date(int d = 1, int m = 1, int y = 2000) : day(d), month(m), year(y) {}
+
+    bool operator > (const Date& other) const {
+        if (year != other.year) return year > other.year;
+        if (month != other.month) return month > other.month;
+        return day > other.day;
+    }
+
+    void input() {
+        cout << "День: "; cin >> day;
+        cout << "Месяц: "; cin >> month;
+        cout << "Год: "; cin >> year;
+    }
+
+    void print() const {
+        cout << day << "." << month << "." << year;
+    }
+
+    friend ostream& operator<<(ostream& os, const Date& d);
+    friend istream& operator>>(istream& is, Date& d);
+};
+
+ostream& operator<<(ostream& os, const Date& d) {
+    os << d.day << " " << d.month << " " << d.year;
+    return os;
+}
+
+istream& operator>>(istream& is, Date& d) {
+    is >> d.day >> d.month >> d.year;
+    return is;
+}
+
+// Базовый класс Common
+class Common {
+protected:
+    FIO fio;
+    Date birthDate;
+public:
+    Common() {}
+    virtual ~Common() {}
+
+    virtual void input() = 0;
+    virtual void print() const = 0;
+    virtual void saveToFile(ofstream& out) const = 0;
+    virtual void loadFromFile(ifstream& in) = 0;
+
+    bool isBirthAfter(const Date& date) const {
+        return birthDate > date;
+    }
+};
+
+// Производный класс Learner
+class Learner : public Common {
+private:
+    string group;
+public:
+    void input() override {
+        cout << "Ввод студента:\n";
+        fio.input();
+        birthDate.input();
+        cout << "Группа: "; cin >> group;
+    }
+
+    void print() const override {
+        cout << "Студент: ";
+        fio.print();
+        cout << ", Дата рождения: ";
+        birthDate.print();
+        cout << ", Группа: " << group << endl;
+    }
+
+    void saveToFile(ofstream& out) const override {
+        out << "Learner ";
+        out << fio.getSurname() << " " << fio.getName() << " ";
+        out << birthDate << " ";
+        out << group << "\n";
+    }
+
+    void loadFromFile(ifstream& in) override {
+        string surname, name, grp;
+        in >> surname >> name;
+        fio.setSurname(surname);
+        fio.setName(name);
+        in >> birthDate;
+        in >> grp;
+        group = grp;
+    }
+};
+
+// Производный класс Tutor
+class Tutor : public Common {
+private:
+    string course;
+public:
+    void input() override {
+        cout << "Ввод преподавателя:\n";
+        fio.input();
+        birthDate.input();
+        cout << "Курс: "; cin >> course;
+    }
+
+    void print() const override {
+        cout << "Преподаватель: ";
+        fio.print();
+        cout << ", Дата рождения: ";
+        birthDate.print();
+        cout << ", Курс: " << course << endl;
+    }
+
+    void saveToFile(ofstream& out) const override {
+        out << "Tutor ";
+        out << fio.getSurname() << " " << fio.getName() << " ";
+        out << birthDate << " ";
+        out << course << "\n";
+    }
+
+    void loadFromFile(ifstream& in) override {
+        string surname, name, crs;
+        in >> surname >> name;
+        fio.setSurname(surname);
+        fio.setName(name);
+        in >> birthDate;
+        in >> crs;
+        course = crs;
+    }
+};
+
+// Функции для работы с файлами
+void saveData(Common** arr, int size, const char* filename) {
+    ofstream out(filename);
+    if (!out) {
+        cerr << "Ошибка открытия файла!\n";
+        return;
+    }
+    for (int i = 0; i < size; ++i) {
+        arr[i]->saveToFile(out);
+    }
+    out.close();
+}
+
+void loadData(Common**& arr, int& size, const char* filename) {
+    ifstream in(filename);
+    if (!in) {
+        cerr << "Файл не найден!\n";
+        return;
+    }
+    string type;
+    while (in >> type) {
+        Common* ptr = nullptr;
+        if (type == "Learner") ptr = new Learner();
+        else if (type == "Tutor") ptr = new Tutor();
+        if (ptr) {
+            ptr->loadFromFile(in);
+            Common** newArr = new Common*[size + 1];
+            for (int i = 0; i < size; ++i) newArr[i] = arr[i];
+            newArr[size++] = ptr;
+            delete[] arr;
+            arr = newArr;
+        }
+    }
+    in.close();
+}
+
+int main() {
+    // Создание динамических массивов
+    Common** learners = new Common*[10];
+    Common** tutors = new Common*[10];
+    int learnCount = 0, tutorCount = 0;
+
+    // Добавление элементов
+    learners[learnCount++] = new Learner();
+    learners[0]->input();
+
+    tutors[tutorCount++] = new Tutor();
+    tutors[0]->input();
+
+    // Сохранение в файл
+    saveData(learners, learnCount, "learners.dat");
+    saveData(tutors, tutorCount, "tutors.dat");
+
+    // Поиск по дате
+    Date target(1, 1, 2000);
+    Common** result = new Common*[20];
+    int resCount = 0;
+
+    for (int i = 0; i < learnCount; ++i) {
+        if (learners[i]->isBirthAfter(target)) {
+            result[resCount++] = learners[i];
+        }
+    }
+
+    for (int i = 0; i < tutorCount; ++i) {
+        if (tutors[i]->isBirthAfter(target)) {
+            result[resCount++] = tutors[i];
+        }
+    }
+
+    // Вывод результатов
+    cout << "\nРезультаты поиска:\n";
+    for (int i = 0; i < resCount; ++i) {
+        result[i]->print();
+    }
+
+    // Очистка памяти
+    for (int i = 0; i < learnCount; ++i) delete learners[i];
+    for (int i = 0; i < tutorCount; ++i) delete tutors[i];
+    delete[] learners;
+    delete[] tutors;
+    delete[] result;
+
+    return 0;
+}
