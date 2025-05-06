@@ -1,0 +1,185 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <cctype>
+
+using namespace std;
+
+// Шаблонная функция для инициализации массива случайными числами
+template <typename T>
+void initArray(T* arr, int size, T min, T max) {
+    for (int i = 0; i < size; i++) {
+        arr[i] = min + static_cast<T>(rand()) / (static_cast<T>(RAND_MAX / (max - min))));
+    }
+}
+
+// Явная перегрузка для типа char
+template <>
+void initArray<char>(char* arr, int size, char min, char max) {
+    for (int i = 0; i < size; i++) {
+        arr[i] = 'a' + rand() % 26; // Случайные буквы латинского алфавита
+    }
+}
+
+// Шаблонная функция для ввода числа K и создания массива индексов
+template <typename T>
+int* createIndexArray(const T* arr, int size, T K, int& resultSize) {
+    resultSize = 0;
+    // Сначала подсчитаем количество элементов <= K
+    for (int i = 0; i < size; i++) {
+        if (arr[i] <= K) {
+            resultSize++;
+        }
+    }
+    
+    // Создаем массив индексов
+    int* indexArray = new int[resultSize];
+    int j = 0;
+    for (int i = 0; i < size; i++) {
+        if (arr[i] <= K) {
+            indexArray[j++] = i;
+        }
+    }
+    
+    return indexArray;
+}
+
+// Шаблонный класс для работы с динамическими массивами
+template <typename T>
+class DynamicArray {
+private:
+    int n;    // размер массива
+    T* Bp;    // начальный адрес
+    T* Tp;    // рабочий указатель
+
+public:
+    // Конструктор
+    DynamicArray(int size, T min, T max) : n(size) {
+        Bp = new T[n];
+        Tp = Bp;
+        
+        // Инициализация случайными числами
+        for (int i = 0; i < n; i++) {
+            Bp[i] = min + static_cast<T>(rand()) / (static_cast<T>(RAND_MAX / (max - min)));
+        }
+    }
+    
+    // Деструктор
+    ~DynamicArray() {
+        delete[] Bp;
+    }
+    
+    // Печать массива
+    void printArray() {
+        cout << "Array (" << n << " elements):" << endl;
+        for (int i = 0; i < n; i++) {
+            cout << Bp[i] << "\t";
+            if ((i + 1) % 5 == 0) cout << endl;
+        }
+        cout << endl;
+    }
+    
+    // Поиск максимального положительного элемента
+    T* findMaxPositive() {
+        T* maxPos = nullptr;
+        for (int i = 0; i < n; i++) {
+            if (Bp[i] > 0) {
+                if (maxPos == nullptr || Bp[i] > *maxPos) {
+                    maxPos = &Bp[i];
+                }
+            }
+        }
+        return maxPos;
+    }
+};
+
+int main() {
+    srand(time(0)); // Инициализация генератора случайных чисел
+    
+    // 1. Создать динамические массивы типа double и char
+    const int size = 10;
+    double* doubleArray = new double[size];
+    char* charArray = new char[size];
+    
+    // 2. Применить все шаблонные функции к каждому из массивов
+    
+    // Инициализация массивов
+    initArray(doubleArray, size, 0.0, 100.0);
+    initArray(charArray, size, 'a', 'z');
+    
+    // Вывод массивов
+    cout << "Double array:" << endl;
+    for (int i = 0; i < size; i++) {
+        cout << doubleArray[i] << " ";
+    }
+    cout << endl << endl;
+    
+    cout << "Char array:" << endl;
+    for (int i = 0; i < size; i++) {
+        cout << charArray[i] << " ";
+    }
+    cout << endl << endl;
+    
+    // Создание массива индексов для double
+    double K;
+    cout << "Enter K for double array: ";
+    cin >> K;
+    
+    int doubleIndexSize;
+    int* doubleIndexArray = createIndexArray(doubleArray, size, K, doubleIndexSize);
+    
+    cout << "Indices of elements <= " << K << " in double array:" << endl;
+    for (int i = 0; i < doubleIndexSize; i++) {
+        cout << doubleIndexArray[i] << " ";
+    }
+    cout << endl << endl;
+    delete[] doubleIndexArray;
+    
+    // Создание массива индексов для char
+    char charK;
+    cout << "Enter K for char array: ";
+    cin >> charK;
+    
+    int charIndexSize;
+    int* charIndexArray = createIndexArray(charArray, size, charK, charIndexSize);
+    
+    cout << "Indices of elements <= " << charK << " in char array:" << endl;
+    for (int i = 0; i < charIndexSize; i++) {
+        cout << charIndexArray[i] << " ";
+    }
+    cout << endl << endl;
+    delete[] charIndexArray;
+    
+    // 3. Проконтролировать правильность работы явно перегруженной функции
+    // (уже сделано при инициализации charArray)
+    
+    // Демонстрация работы шаблонного класса
+    cout << "Demonstrating DynamicArray class:" << endl;
+    
+    // С массивом int
+    DynamicArray<int> intArray(15, -50, 50);
+    intArray.printArray();
+    int* maxPosInt = intArray.findMaxPositive();
+    if (maxPosInt) {
+        cout << "Max positive element in int array: " << *maxPosInt << endl;
+    } else {
+        cout << "No positive elements in int array" << endl;
+    }
+    cout << endl;
+    
+    // С массивом double
+    DynamicArray<double> dblArray(12, -100.0, 100.0);
+    dblArray.printArray();
+    double* maxPosDbl = dblArray.findMaxPositive();
+    if (maxPosDbl) {
+        cout << "Max positive element in double array: " << *maxPosDbl << endl;
+    } else {
+        cout << "No positive elements in double array" << endl;
+    }
+    
+    // Освобождение памяти
+    delete[] doubleArray;
+    delete[] charArray;
+    
+    return 0;
+}
