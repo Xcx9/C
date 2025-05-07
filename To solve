@@ -1,0 +1,143 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <string>
+
+using namespace std;
+
+template <typename T>
+void initArray(T* arr, int size) {
+    for (int i = 0; i < size; ++i) {
+        arr[i] = rand() % 100;
+    }
+}
+
+template <>
+void initArray<char>(char* arr, int size) {
+    for (int i = 0; i < size; ++i) {
+        arr[i] = 'A' + (rand() % 26);
+    }
+}
+
+template <typename T>
+int* getIndices(const T arr, int size, T K, int& resultSize) {
+    resultSize = 0;
+    for (int i = 0; i < size; ++i) {
+        if (arr[i] <= K) resultSize++;
+    }
+
+    int* indices = new int[resultSize];
+    int idx = 0;
+    for (int i = 0; i < size; ++i) {
+        if (arr[i] <= K) indices[idx++] = i;
+    }
+    return indices;
+}
+
+
+template <typename T>
+class Array {
+private:
+    int  n;
+    int* Bp;
+    T* Tp;
+    T* data;
+    int size;
+public:
+    Array(int n) : size(n) {
+        data = new T[size];
+        for (int i = 0; i < size; ++i) {
+            data[i] = rand() % 201 - 100;
+        }
+    }
+
+    ~Array() {
+        delete[] data;
+    }
+
+    void print() {
+        for (int i = 0; i < size; ++i) {
+            cout << data[i] << " ";
+        }
+        cout << endl;
+    }
+
+    T* findMaxPositive() {
+        T maxVal = -1;
+        T* maxPtr = nullptr;
+        for (int i = 0; i < size; ++i) {
+            if (data[i] > 0 && data[i] > maxVal) {
+                maxVal = data[i];
+                maxPtr = &data[i];
+            }
+        }
+        return maxPtr;
+    }
+};
+
+int main() {
+    srand(time(nullptr));
+    int K;
+    do {
+        cout << "Enter K: ";
+        cin >> K;
+        /*try {
+            int K = stoi(num);
+            cout << "Got:" << num << std::endl;
+        }
+        catch (const invalid_argument& e) {
+            cout << "Error: invalid argument!" << endl;
+            K = 0;
+        }
+        for (auto i: num) 
+        {
+            if (i == ',' || i == '.')
+            {
+                K = 0.1;
+                break;
+            }
+            else
+                K = stoi(num);
+        }*/
+        if (K <= 0 || K % 1 != 0) {
+            cout << "Wrong input!" << endl;
+        }
+    } while (K <= 0);
+
+    double arrDouble[5];
+    initArray(arrDouble, 5);
+    cout << "Double array: ";
+    for (int i = 0; i < 5; ++i) cout << arrDouble[i] << " ";
+    cout << endl;
+
+    double K;
+    cout << "Enter K: ";
+    cin >> K;
+    int count;
+    int* indices = getIndices(arrDouble, 5, K, count);
+    cout << "Indices (<= K): ";
+    for (int i = 0; i < count; ++i) cout << indices[i] << " ";
+    cout << endl;
+    delete[] indices;
+    
+    cout << "Input size of array" << endl;
+    cin >> K;
+    
+    char* arrchar = new char[K];
+    initArray(arrchar, K);
+    cout << "Char array: ";
+    for (int i = 0; i < K; ++i)
+        cout << arrchar[i] << " ";
+    cout << endl;
+
+    Array<int> da(K);
+    cout << "Array: ";
+    da.print();
+    int* maxPos = da.findMaxPositive();
+    if (maxPos)
+        cout << "Max positive: " << *maxPos << endl;
+    else
+        cout << "No positive elements" << endl;
+
+    return 0;
+}
