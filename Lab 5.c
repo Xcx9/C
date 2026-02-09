@@ -4,7 +4,7 @@
 #include <time.h>
 #include <Windows.h>
 
-
+//#1
 /*char** set_smth(char** str, int k);
 
 int main()
