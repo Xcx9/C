@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp2
 {
-    internal class Animal:Organism
+    internal class Animal : Organism
     {
         private string _name;
         private int _hunger;
         public readonly string type;
-        
+
 
 
 
@@ -26,14 +26,14 @@ namespace ConsoleApp2
             }
         }
 
-        public Animal() 
+        public Animal()
         {
             _name = "Unknown";
             _hunger = 0;
         }
 
-        public Animal(string name, int hunger = 0) 
-        { 
+        public Animal(string name, int hunger = 0)
+        {
             _name = name;
             _hunger = hunger;
         }
@@ -41,16 +41,36 @@ namespace ConsoleApp2
 
         private void Hunt()
         {
-
+            Random rnd = new Random();
+            int hunt_luck = rnd.Next(-_hunger, 4);
+            _hunger += hunt_luck;
+            if (hunt_luck < 0)
+            {
+                Console.WriteLine("Вы нашли добычу, но не поймали её, голод увеличился ):");
+                Console.WriteLine($"Уровень голода у {_name}:{_hunger}\nУровень энергии: {checkEnergy()}");
+            }
+            else if (hunt_luck == 0)
+            {
+                Console.WriteLine("Вы никого не нашли, ");
+                Console.WriteLine($"Уровень голода у {_name}:{_hunger}");
+            }
+            else 
+            {
+                Console.WriteLine("Вы поймали добычу!");
+                Console.WriteLine($"Уровень голода у {_name}:{_hunger}");
+            }
         }
 
         private void Chill()
         {
-            _hunger -= 1;
+            Console.WriteLine("Вы отдохнули, голод увеличился");
+            _hunger += 1;
+            Console.WriteLine($"Уровень голода у {_name}:{_hunger}");
         }
 
-        public override int checkEnergy() 
-        { 
+        // Чем больше голод, тем меньше жнергия
+        public override int checkEnergy()
+        {
             switch (_hunger)
             {
                 case 0: return 10;
@@ -68,7 +88,7 @@ namespace ConsoleApp2
 
             }
 
-            return 0; 
+            return 0;
         }
     }
 }
