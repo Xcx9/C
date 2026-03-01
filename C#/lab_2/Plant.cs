@@ -6,19 +6,37 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp2
 {
-    internal class Plant:Organism
+    internal class Plant : Organism
     {
         private string _name;
         private double _illumination;
 
         public Plant() { _name = "Unknown"; _illumination = 1.0; }
-        public Plant(string name, int illumination = 0) { }
+        public Plant(string name, int illumination = 0) { _name = name; _illumination = illumination; }
 
 
-        private void checkIllumination()
+        public void checkIllumination()
         {
-
+            Console.WriteLine($"Уровень освещения у {_name}: {_illumination}");
         }
+
+        public void changeIllumination() 
+        {
+            int value;
+            bool isValid;
+            do
+            {
+                Console.Write($"Введите целое число от {1} до {10}: ");
+                string input = Console.ReadLine();
+                isValid = int.TryParse(input, out value) && value >= 1 && value <= 10;
+                if (!isValid)
+                {
+                    Console.WriteLine($"Ошибка! Введите число от {1} до {10}.");
+                }
+            } while (!isValid);
+            _illumination = value / 10;
+            Console.WriteLine($"Теперь уровень освещения {_name}: {_illumination}");
+        } 
 
         public override int checkEnergy()
         {
