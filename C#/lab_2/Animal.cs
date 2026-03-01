@@ -38,10 +38,12 @@ namespace ConsoleApp2
             _hunger = hunger;
         }
 
-
+        
         private void Hunt()
         {
-            Random rnd = new Random();
+            if (_hunger == 0) { Console.WriteLine("К сожалению у животного не осталось сил охотиться."); }
+            else { 
+                Random rnd = new Random();
             int hunt_luck = rnd.Next(-_hunger, 4);
             _hunger += hunt_luck;
             if (hunt_luck < 0)
@@ -58,6 +60,7 @@ namespace ConsoleApp2
             {
                 Console.WriteLine("Вы поймали добычу!");
                 Console.WriteLine($"Уровень голода у {_name}:{_hunger}");
+            }
             }
         }
 
