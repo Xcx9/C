@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp2
 {
-    internal class Animal : Organism
+    internal class Animal : Organism, ILogInfo
     {
         private string _name;
+        private int _age;
         private int _hunger;
-        public readonly string type;
-
-
-
+        private int _energy;
+        public readonly string organism_type = "Animal";
 
         public string Name
         {
@@ -26,27 +25,24 @@ namespace ConsoleApp2
             }
         }
 
-        public Animal()
-        {
-            _name = "Unknown";
-            _hunger = 0;
-        }
-
-        public Animal(string name, int hunger = 0)
+        public Animal(string name, int age, int hunger = 0) : base("Животное", name, age)
         {
             _name = name;
+            _age = age;
             _hunger = hunger;
+            _energy = 10 - hunger;
         }
 
         
-        private void Hunt()
+        public void Hunt()
         {
-            if (_hunger == 0) { Console.WriteLine("К сожалению у животного не осталось сил охотиться."); }
+            if (_energy == 0) { Console.WriteLine("К сожалению у животного не осталось сил охотиться."); }
             else { 
-                Random rnd = new Random();
+            Random rnd = new Random();
             int hunt_luck = rnd.Next(-_hunger, 4);
             _hunger += hunt_luck;
-            if (hunt_luck < 0)
+            _energy -= hunt_luck;
+            if (hunt_luck > 0)
             {
                 Console.WriteLine("Вы нашли добычу, но не поймали её, голод увеличился ):");
                 Console.WriteLine($"Уровень голода у {_name}:{_hunger}\nУровень энергии: {checkEnergy()}");
@@ -64,34 +60,27 @@ namespace ConsoleApp2
             }
         }
 
-        private void Chill()
+        public void Chill()
         {
             Console.WriteLine("Вы отдохнули, голод увеличился");
             _hunger += 1;
             Console.WriteLine($"Уровень голода у {_name}:{_hunger}");
+            _energy -= 1;
         }
 
-        // Чем больше голод, тем меньше жнергия
+        // Чем больше голод, тем меньше энергия
         public override int checkEnergy()
         {
-            switch (_hunger)
-            {
-                case 0: return 10;
-                case 1: return 9;
-                case 2: return 8;
-                case 3: return 7;
-                case 4: return 6;
-                case 5: return 5;
-                case 6: return 4;
-                case 7: return 3;
-                case 8: return 2;
-                case 9: return 1;
-                case 10: return 0;
-                default: return -1;
+            return _energy;
+        }
+        public override string ToString()
+        {
+            return $"Животное: {_name}, голод: {_hunger}";
+        }
 
-            }
-
-            return 0;
+        public string LogInfo()
+        {
+            return $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Статус: {GetStatus()}";
         }
     }
 }
