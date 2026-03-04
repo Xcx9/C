@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp2
 {
-    interface LogInfo
+    public interface ILogInfo
     {
-        string Name { get; }
-        string Log { get; }
-        string LogInfo { get => $"[{{date}}] Статус: {{GetStatus()}}"; }
+        string LogInfo();
     }
 }
