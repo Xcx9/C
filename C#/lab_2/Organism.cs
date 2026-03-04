@@ -1,49 +1,53 @@
+using System.Xml.Linq;
+
 namespace ConsoleApp2
 {
-    abstract class Organism
+    abstract class Organism : IComparable<Organism>
     {
-        public readonly string type;
-        public int energy;
-        public int age
+        public readonly string organism_type;
+        private int _energy;
+        private string _name;
+        private int _age;
+
+        public string Name
         {
-            get => age;
+            get => _name;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException("Имя животного не может быть пустым.");
+                _name = value;
+            }
+        }
+
+        protected int Age
+        {
+            get => _age;
             set
             {
                 if (value < 0)
                     throw new ArgumentException("Возраст не может быть отрицательным.");
-                age = value;
+                _age = value;
             }
         }
-
 
         public abstract int checkEnergy();
 
-        public virtual string GetStatus() { return $"Тип: {type}, Возраст: {age}"; }
+        public virtual string GetStatus() { return $"Тип: {organism_type}\n Имя: {_name}, Возраст: {_age}"; }
 
-        interface IComparable<T> 
+        public int CompareTo(Organism other)
         {
-            void compaire_Age(List<T> list)
-            {
+            if (other == null) return 1;
 
-            }
+            return Age.CompareTo(other.Age);
         }
 
-        /*
-        public abstract void getName(string name);
-        public abstract void setName(string name);
-        */
-        protected Organism() 
-        {
-            type = "Unknown";
-            energy = 10;
-            age = 0;
-        }
 
-        protected Organism(string type = "Unknown", int energy = 10, int age = 0)
+        protected Organism(string org_type, string name, int age)
         {
-            this.type = type;
-            this.energy = energy;
-            this.age = age;
+            organism_type = org_type;
+            Name = name;
+            Age = age;
         }
     }
 }
