@@ -1,4 +1,4 @@
-namespace Lab5_AsyncParallel
+namespace lab5
 {
     static class Config
     {
