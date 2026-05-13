@@ -1,0 +1,108 @@
+// ViewModels/MainWindowViewModel.cs
+using System;
+using System.Collections.ObjectModel;
+using System.Reactive;
+using System.Reactive.Linq;
+using DynamicData;
+using ReactiveUI;
+using ThreadProfiler.Models;
+using ThreadProfiler.Services;
+
+namespace ThreadProfiler.ViewModels
+{
+    public class MainWindowViewModel : ReactiveObject
+    {
+        private readonly ITaskSimulator _simulator;
+        private readonly SourceList<TaskInfo> _allTasksSource = new();
+        private readonly ReadOnlyObservableCollection<TaskInfo> _filteredTasks;
+        private string _searchText = "";
+        private bool _isRunning;
+
+        public ReadOnlyObservableCollection<TaskInfo> FilteredTasks => _filteredTasks;
+        
+        public string SearchText
+        {
+            get => _searchText;
+            set => this.RaiseAndSetIfChanged(ref _searchText, value);
+        }
+
+        public bool IsRunning
+        {
+            get => _isRunning;
+            private set => this.RaiseAndSetIfChanged(ref _isRunning, value);
+        }
+
+        public ReactiveCommand<Unit, Unit> StartCommand { get; }
+        public ReactiveCommand<Unit, Unit> StopCommand { get; }
+        public ReactiveCommand<Unit, Unit> ClearCommand { get; }
+
+        public MainWindowViewModel(ITaskSimulator simulator)
+        {
+            _simulator = simulator;
+
+            // настройка фильтрации с debounce (живой поиск)
+            var filterObservable = this.WhenAnyValue(x => x.SearchText)
+                .Throttle(TimeSpan.FromMilliseconds(500))
+                .Select(BuildFilter);
+
+            _allTasksSource
+                .Connect()
+                .Filter(filterObservable)
+                .Bind(out _filteredTasks)
+                .Subscribe();
+
+            // подписка на события симулятора
+            _simulator.TaskEvents
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(OnTaskEvent)
+                .DisposeWith(CleanUpDisposables); // управление подписками
+
+            StartCommand = ReactiveCommand.Create(() => Start());
+            StopCommand = ReactiveCommand.Create(() => Stop());
+            ClearCommand = ReactiveCommand.Create(() => Clear());
+        }
+
+        private void Start()
+        {
+            _simulator.Start(100); // 100 задач для демонстрации
+            IsRunning = true;
+        }
+
+        private void Stop()
+        {
+            _simulator.Stop();
+            IsRunning = false;
+        }
+
+        private void Clear()
+        {
+            _allTasksSource.Clear();
+        }
+
+        private void OnTaskEvent(TaskEvent evt)
+        {
+            if (evt.Type == TaskEventType.Started)
+            {
+                _allTasksSource.Add(evt.Task);
+            }
+            else if (evt.Type == TaskEventType.Completed)
+            {
+                // обновляем существующую задачу (поскольку EndTime изменилась)
+                var index = _allTasksSource.Items.IndexOf(evt.Task);
+                if (index != -1)
+                {
+                    _allTasksSource.ReplaceAt(index, evt.Task);
+                }
+            }
+        }
+
+        private Func<TaskInfo, bool> BuildFilter(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return task => true;
+            return task => task.Id.ToString().Contains(text) ||
+                           task.Status.Contains(text, StringComparison.OrdinalIgnoreCase) ||
+                           task.ManagedThreadId.ToString().Contains(text);
+        }
+    }
+}
