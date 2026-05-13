@@ -1,0 +1,48 @@
+<!-- Views/MainWindow.axaml -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:ThreadProfiler.ViewModels"
+        xmlns:ctrls="clr-namespace:ThreadProfiler.Controls"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        x:Class="ThreadProfiler.Views.MainWindow"
+        Title="Thread Profiler - Gantt Chart"
+        MinWidth="800" MinHeight="600">
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5">
+            <Button Command="{Binding StartCommand}" Content="Start" Margin="2" />
+            <Button Command="{Binding StopCommand}" Content="Stop" Margin="2" />
+            <Button Command="{Binding ClearCommand}" Content="Clear" Margin="2" />
+            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                     Watermark="Search by ID, status, thread..." Width="200" Margin="10,0,0,0"/>
+        </StackPanel>
+
+        <Grid DockPanel.Dock="Bottom" RowDefinitions="Auto,*">
+            <TextBlock Text="Task List (Virtualized)" Margin="5,0" />
+            <ListBox Grid.Row="1" ItemsSource="{Binding FilteredTasks}" Margin="5"
+                     VirtualizingPanel.IsVirtualizing="True"
+                     VirtualizingPanel.VirtualizationMode="Recycling">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="{Binding Id}" Width="40" />
+                            <TextBlock Text="{Binding ManagedThreadId}" Width="80" />
+                            <TextBlock Text="{Binding DurationMs, StringFormat={}{0:F0} ms}" Width="80" />
+                            <TextBlock Text="{Binding Status}" Width="80" />
+                            <TextBlock Text="{Binding StartTime, StringFormat=HH:mm:ss}" Width="80" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+
+        <Border DockPanel.Dock="Top" Height="300" Margin="5" BorderBrush="Gray" BorderThickness="1">
+            <ctrls:GanttChartControl Tasks="{Binding FilteredTasks}" Zoom="1.0" />
+        </Border>
+    </DockPanel>
+</Window>
